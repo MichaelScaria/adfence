@@ -53,8 +53,8 @@
             }
         };
         NSString *valueString = [values componentsJoinedByString:@","];
-//        [socketIO sendEvent:@"rawData" withData:@{@"values": valueString}];
-        [socketIO sendEvent:@"" toPath:@"/rawData" withMethod:@"raw" withData:@{@"values": valueString} andAcknowledge:cb];
+        [socketIO sendEvent:@"rawData" withData:@{@"values": valueString}];
+//        [socketIO sendEvent:@"" toPath:@"/rawData" withMethod:@"raw" withData:@{@"values": valueString} andAcknowledge:cb];
     }
     else if (!repeat){
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

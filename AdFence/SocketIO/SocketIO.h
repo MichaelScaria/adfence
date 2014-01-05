@@ -1,8 +1,8 @@
 //
 //  SocketIO.h
-//  v0.4 ARC
+//  v0.4.1 ARC
 //
-//  based on 
+//  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
 //  by Fred Potter <fpotter@pieceable.com>
 //
@@ -15,7 +15,7 @@
 //
 //  Created by Philipp Kyeck http://beta-interactive.de
 //
-//  Updated by 
+//  Updated by
 //    samlown   https://github.com/samlown
 //    kayleg    https://github.com/kayleg
 //    taiyangc  https://github.com/taiyangc
@@ -67,7 +67,7 @@ typedef enum {
     NSString *_endpoint;
     NSDictionary *_params;
     
-    __unsafe_unretained id<SocketIODelegate> _delegate;
+    __weak id<SocketIODelegate> _delegate;
     
     NSObject <SocketIOTransport> *_transport;
     
@@ -100,7 +100,7 @@ typedef enum {
 @property (nonatomic, readonly) NSTimeInterval heartbeatTimeout;
 @property (nonatomic) BOOL useSecure;
 @property (nonatomic, readonly) BOOL isConnected, isConnecting;
-@property (nonatomic, unsafe_unretained) id<SocketIODelegate> delegate;
+@property (nonatomic, weak) id<SocketIODelegate> delegate;
 @property (nonatomic) BOOL returnAllDataFromAck;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate;
@@ -117,10 +117,7 @@ typedef enum {
 - (void) sendJSON:(NSDictionary *)data;
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
 - (void) sendEvent:(NSString *)eventName withData:(id)data;
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path;
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method;
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method withData:(id)data;
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method withData:(id)data andAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function;
 - (void) sendAcknowledgement:(NSString*)pId withArgs:(NSArray *)data;
 
 - (void) setResourceName:(NSString *)name;

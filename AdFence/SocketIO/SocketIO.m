@@ -1,8 +1,8 @@
 //
 //  SocketIO.m
-//  v0.4 ARC
+//  v0.4.1 ARC
 //
-//  based on 
+//  based on
 //  socketio-cocoa https://github.com/fpotter/socketio-cocoa
 //  by Fred Potter <fpotter@pieceable.com>
 //
@@ -15,7 +15,7 @@
 //
 //  Created by Philipp Kyeck http://beta-interactive.de
 //
-//  Updated by 
+//  Updated by
 //    samlown   https://github.com/samlown
 //    kayleg    https://github.com/kayleg
 //    taiyangc  https://github.com/taiyangc
@@ -74,12 +74,12 @@ NSString* const SocketIOException = @"SocketIOException";
 
 @implementation SocketIO
 
-@synthesize isConnected = _isConnected, 
-            isConnecting = _isConnecting, 
-            useSecure = _useSecure, 
-            delegate = _delegate,
-            heartbeatTimeout = _heartbeatTimeout,
-            returnAllDataFromAck = _returnAllDataFromAck;
+@synthesize isConnected = _isConnected,
+isConnecting = _isConnecting,
+useSecure = _useSecure,
+delegate = _delegate,
+heartbeatTimeout = _heartbeatTimeout,
+returnAllDataFromAck = _returnAllDataFromAck;
 
 - (id) initWithDelegate:(id<SocketIODelegate>)delegate
 {
@@ -109,7 +109,7 @@ NSString* const SocketIOException = @"SocketIOException";
             withParams:(NSDictionary *)params
          withNamespace:(NSString *)endpoint
 {
-    [self connectToHost:host onPort:port withParams:params withNamespace:@"" withConnectionTimeout:defaultConnectionTimeout];
+    [self connectToHost:host onPort:port withParams:params withNamespace:endpoint withConnectionTimeout:defaultConnectionTimeout];
 }
 
 - (void) connectToHost:(NSString *)host
@@ -135,8 +135,7 @@ NSString* const SocketIOException = @"SocketIOException";
         // do handshake via HTTP request
         NSString *protocol = _useSecure ? @"https" : @"http";
         NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
-        NSTimeInterval time = [[NSDate date] timeIntervalSince1970];
-        time = time * 1000;
+        NSTimeInterval time = [[NSDate date] timeIntervalSince1970] * 1000;
         NSString *handshakeUrl = [NSString stringWithFormat:kHandshakeURL, protocol, _host, port, kResourceName, time, query];
         
         DEBUGLOG(@"Connecting to socket with URL: %@", handshakeUrl);
@@ -144,7 +143,7 @@ NSString* const SocketIOException = @"SocketIOException";
         
         // make a request
         NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:handshakeUrl]
-                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
+                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
                                              timeoutInterval:connectionTimeout];
         
         _handshake = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
@@ -178,7 +177,7 @@ NSString* const SocketIOException = @"SocketIOException";
     NSString *port = _port ? [NSString stringWithFormat:@":%d", _port] : @"";
     NSString *urlString = [NSString stringWithFormat:kForceDisconnectURL, protocol, _host, port, kResourceName, _sid];
     NSURL *url = [NSURL URLWithString:urlString];
-    //DEBUGLOG(@"Force disconnect at: %@", urlString);
+    DEBUGLOG(@"Force disconnect at: %@", urlString);
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSError *error = nil;
@@ -187,7 +186,7 @@ NSString* const SocketIOException = @"SocketIOException";
     [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     
     if (error || [response statusCode] != 200) {
-        //DEBUGLOG(@"Error during disconnect: %@", error);
+        DEBUGLOG(@"Error during disconnect: %@", error);
     }
     
     [self onDisconnect:error];
@@ -221,31 +220,16 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) sendEvent:(NSString *)eventName withData:(id)data
 {
-    [self sendEvent:eventName toPath:nil withMethod:nil withData:data andAcknowledge:nil];
+    [self sendEvent:eventName withData:data andAcknowledge:nil];
 }
 
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path
-{
-    [self sendEvent:eventName toPath:path withMethod:nil withData:nil andAcknowledge:nil];
-}
-
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method
-{
-    [self sendEvent:eventName toPath:path withMethod:method withData:nil andAcknowledge:nil];
-}
-
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method withData:(id)data
-{
-    [self sendEvent:eventName toPath:path withMethod:method withData:data andAcknowledge:nil];
-}
-
-- (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method withData:(id)data andAcknowledge:(SocketIOCallback)function
+- (void) sendEvent:(NSString *)eventName withData:(id)data andAcknowledge:(SocketIOCallback)function
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:eventName forKey:@"name"];
-
+    
     // do not require arguments
     if (data != nil) {
-        [dict setObject:@[@{@"path": path}, @{@"method": method}, data] forKey:@"args"];
+        [dict setObject:[NSArray arrayWithObject:data] forKey:@"args"];
     }
     
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"event"];
@@ -257,13 +241,13 @@ NSString* const SocketIOException = @"SocketIOException";
     [self send:packet];
 }
 
-- (void) sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data 
+- (void) sendAcknowledgement:(NSString *)pId withArgs:(NSArray *)data
 {
     SocketIOPacket *packet = [[SocketIOPacket alloc] initWithType:@"ack"];
     packet.data = [SocketIOJSONSerialization JSONStringFromObject:data error:nil];
     packet.pId = pId;
     packet.ack = @"data";
-
+    
     [self send:packet];
 }
 
@@ -300,7 +284,7 @@ NSString* const SocketIOException = @"SocketIOException";
         DEBUGLOG(@"Already disconnected!");
         return;
     }
-    //DEBUGLOG(@"send()");
+    DEBUGLOG(@"send()");
     NSNumber *type = [packet typeAsNumber];
     NSMutableArray *encoded = [NSMutableArray arrayWithObject:type];
     
@@ -317,9 +301,8 @@ NSString* const SocketIOException = @"SocketIOException";
     // Add the end point for the namespace to be used, as long as it is not
     // an ACK, heartbeat, or disconnect packet
     if ([type intValue] != 6 && [type intValue] != 2 && [type intValue] != 0) {
-        NSLog(@"_endpoint:%@", _endpoint);
         [encoded addObject:_endpoint];
-    } 
+    }
     else {
         [encoded addObject:@""];
     }
@@ -332,15 +315,14 @@ NSString* const SocketIOException = @"SocketIOException";
         }
         [encoded addObject:[NSString stringWithFormat:@"%@%@", ackpId, packet.data]];
     }
-
+    
     NSString *req = [encoded componentsJoinedByString:@":"];
-    NSLog(@"request:%@", req);
     if (![_transport isReady]) {
-        //DEBUGLOG(@"queue >>> %@", req);
+        DEBUGLOG(@"queue >>> %@", req);
         [_queue addObject:packet];
-    } 
+    }
     else {
-        //DEBUGLOG(@"send() >>> %@", req);
+        DEBUGLOG(@"send() >>> %@", req);
         [_transport send:req];
         
         if ([_delegate respondsToSelector:@selector(socketIO:didSendMessage:)]) {
@@ -349,9 +331,9 @@ NSString* const SocketIOException = @"SocketIOException";
     }
 }
 
-- (void) doQueue 
+- (void) doQueue
 {
-    //DEBUGLOG(@"doQueue() >> %lu", (unsigned long)[_queue count]);
+    DEBUGLOG(@"doQueue() >> %lu", (unsigned long)[_queue count]);
     
     // TODO send all packets at once ... not as seperate packets
     while ([_queue count] > 0) {
@@ -363,16 +345,16 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) onConnect:(SocketIOPacket *)packet
 {
-    //DEBUGLOG(@"onConnect()");
+    DEBUGLOG(@"onConnect()");
     
     _isConnected = YES;
-
+    
     // Send the connected packet so the server knows what it's dealing with.
     // Only required when endpoint/namespace is present
     if ([_endpoint length] > 0) {
         // Make sure the packet we received has an endpoint, otherwise send it again
         if (![packet.endpoint isEqualToString:_endpoint]) {
-            //DEBUGLOG(@"onConnect() >> End points do not match, resending connect packet");
+            DEBUGLOG(@"onConnect() >> End points do not match, resending connect packet");
             [self sendConnect];
             return;
         }
@@ -412,22 +394,22 @@ NSString* const SocketIOException = @"SocketIOException";
 # pragma mark -
 # pragma mark Heartbeat methods
 
-- (void) onTimeout 
+- (void) onTimeout
 {
     if (_timeout) {
         dispatch_source_cancel(_timeout);
         _timeout = NULL;
     }
     
-    //DEBUGLOG(@"Timed out waiting for heartbeat.");
+    DEBUGLOG(@"Timed out waiting for heartbeat.");
     [self onDisconnect:[NSError errorWithDomain:SocketIOError
                                            code:SocketIOHeartbeatTimeout
                                        userInfo:nil]];
 }
 
-- (void) setTimeout 
+- (void) setTimeout
 {
-    ////DEBUGLOG(@"start/reset timeout");
+    DEBUGLOG(@"start/reset timeout");
     if (_timeout) {
         dispatch_source_cancel(_timeout);
         _timeout = NULL;
@@ -469,7 +451,7 @@ NSString* const SocketIOException = @"SocketIOException";
             NSString *nsmatchStr = nil;
             if (range.location != NSNotFound && NSMaxRange(range) <= [data length]) {
                 nsmatchStr = [data substringWithRange:[nsmatchTest rangeAtIndex:i]];
-            } 
+            }
             else {
                 nsmatchStr = @"";
             }
@@ -487,7 +469,7 @@ NSString* const SocketIOException = @"SocketIOException";
 
 - (void) onData:(NSString *)data
 {
-    ////DEBUGLOG(@"onData %@", data);
+    DEBUGLOG(@"onData %@", data);
     
     // data arrived -> reset timeout
     [self setTimeout];
@@ -515,26 +497,26 @@ NSString* const SocketIOException = @"SocketIOException";
         //
         switch (idx) {
             case 0: {
-               // //DEBUGLOG(@"disconnect");
+                DEBUGLOG(@"disconnect");
                 [self onDisconnect:[NSError errorWithDomain:SocketIOError
                                                        code:SocketIOServerRespondedWithDisconnect
                                                    userInfo:nil]];
                 break;
             }
             case 1: {
-                //DEBUGLOG(@"connected");
+                DEBUGLOG(@"connected");
                 // from socket.io.js ... not sure when data will contain sth?!
                 // packet.qs = data || '';
                 [self onConnect:packet];
                 break;
             }
             case 2: {
-                //DEBUGLOG(@"heartbeat");
+                DEBUGLOG(@"heartbeat");
                 [self sendHeartbeat];
                 break;
             }
             case 3: {
-                //DEBUGLOG(@"message");
+                DEBUGLOG(@"message");
                 if (packet.data && ![packet.data isEqualToString:@""]) {
                     if ([_delegate respondsToSelector:@selector(socketIO:didReceiveMessage:)]) {
                         [_delegate socketIO:self didReceiveMessage:packet];
@@ -543,7 +525,7 @@ NSString* const SocketIOException = @"SocketIOException";
                 break;
             }
             case 4: {
-                //DEBUGLOG(@"json");
+                DEBUGLOG(@"json");
                 if (packet.data && ![packet.data isEqualToString:@""]) {
                     if ([_delegate respondsToSelector:@selector(socketIO:didReceiveJSON:)]) {
                         [_delegate socketIO:self didReceiveJSON:packet];
@@ -552,7 +534,7 @@ NSString* const SocketIOException = @"SocketIOException";
                 break;
             }
             case 5: {
-                //DEBUGLOG(@"event");
+                DEBUGLOG(@"event");
                 if (packet.data && ![packet.data isEqualToString:@""]) {
                     NSDictionary *json = [packet dataAsJSON];
                     packet.name = [json objectForKey:@"name"];
@@ -564,7 +546,7 @@ NSString* const SocketIOException = @"SocketIOException";
                 break;
             }
             case 6: {
-                //DEBUGLOG(@"ack");
+                DEBUGLOG(@"ack");
                 
                 // create regex result
                 NSMutableArray *pieces = [self getMatchesFrom:packet.data with:regexPieces];
@@ -572,7 +554,7 @@ NSString* const SocketIOException = @"SocketIOException";
                 if ([pieces count] > 0) {
                     NSArray *piece = [pieces objectAtIndex:0];
                     int ackId = [[piece objectAtIndex:1] intValue];
-                    //DEBUGLOG(@"ack id found: %d", ackId);
+                    DEBUGLOG(@"ack id found: %d", ackId);
                     
                     NSString *argsStr = [piece objectAtIndex:3];
                     id argsData = nil;
@@ -596,15 +578,15 @@ NSString* const SocketIOException = @"SocketIOException";
                 break;
             }
             case 7: {
-                //DEBUGLOG(@"error");
+                DEBUGLOG(@"error");
                 break;
             }
             case 8: {
-                ////DEBUGLOG(@"noop");
+                DEBUGLOG(@"noop");
                 break;
             }
             default: {
-                //DEBUGLOG(@"command not found or not yet supported");
+                DEBUGLOG(@"command not found or not yet supported");
                 break;
             }
         }
@@ -612,13 +594,13 @@ NSString* const SocketIOException = @"SocketIOException";
         packet = nil;
     }
     else {
-        //DEBUGLOG(@"ERROR: data that has arrived wasn't valid");
+        DEBUGLOG(@"ERROR: data that has arrived wasn't valid");
     }
 }
 
 - (void) onDisconnect:(NSError *)error
 {
-    //DEBUGLOG(@"onDisconnect()");
+    DEBUGLOG(@"onDisconnect()");
     BOOL wasConnected = _isConnected;
     BOOL wasConnecting = _isConnecting;
     
@@ -658,12 +640,12 @@ NSString* const SocketIOException = @"SocketIOException";
 
 # pragma mark -
 # pragma mark Handshake callbacks (NSURLConnectionDataDelegate)
-- (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response 
+- (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
     // check for server status code (http://gigliwood.com/weblog/Cocoa/Q__When_is_an_conne.html)
     if ([response respondsToSelector:@selector(statusCode)]) {
         NSInteger statusCode = [((NSHTTPURLResponse *)response) statusCode];
-        //DEBUGLOG(@"didReceiveResponse() %i", statusCode);
+        DEBUGLOG(@"didReceiveResponse() %i", statusCode);
         
         if (statusCode >= 400) {
             // stop connecting; no more delegate messages
@@ -682,12 +664,12 @@ NSString* const SocketIOException = @"SocketIOException";
     [_httpRequestData setLength:0];
 }
 
-- (void) connection:(NSURLConnection *)connection didReceiveData:(NSData *)data 
+- (void) connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    [_httpRequestData appendData:data]; 
+    [_httpRequestData appendData:data];
 }
 
-- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error 
+- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     NSLog(@"ERROR: handshake failed ... %@", [error localizedDescription]);
     
@@ -695,7 +677,8 @@ NSString* const SocketIOException = @"SocketIOException";
     _isConnecting = NO;
     
     if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
-        NSMutableDictionary *errorInfo = [[NSDictionary dictionaryWithObject:error forKey:NSLocalizedDescriptionKey] mutableCopy];
+        NSMutableDictionary *errorInfo = [[NSDictionary dictionaryWithObject:error
+                                                                      forKey:NSUnderlyingErrorKey] mutableCopy];
         
         NSError *err = [NSError errorWithDomain:SocketIOError
                                            code:SocketIOHandshakeFailed
@@ -712,11 +695,11 @@ NSString* const SocketIOException = @"SocketIOException";
     }
 }
 
-- (void) connectionDidFinishLoading:(NSURLConnection *)connection 
-{ 	
- 	NSString *responseString = [[NSString alloc] initWithData:_httpRequestData encoding:NSASCIIStringEncoding];
-
-    //DEBUGLOG(@"connectionDidFinishLoading() %@", responseString);
+- (void) connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    NSString *responseString = [[NSString alloc] initWithData:_httpRequestData encoding:NSASCIIStringEncoding];
+    
+    DEBUGLOG(@"connectionDidFinishLoading() %@", responseString);
     NSArray *data = [responseString componentsSeparatedByString:@":"];
     // should be SID : heartbeat timeout : connection timeout : supported transports
     
@@ -731,7 +714,7 @@ NSString* const SocketIOException = @"SocketIOException";
     }
     else {
         // check SID
-        //DEBUGLOG(@"sid: %@", _sid);
+        DEBUGLOG(@"sid: %@", _sid);
         NSString *regex = @"[^0-9]";
         NSPredicate *regexTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
         if ([_sid rangeOfString:@"error"].location != NSNotFound || [regexTest evaluateWithObject:_sid]) {
@@ -749,25 +732,25 @@ NSString* const SocketIOException = @"SocketIOException";
             // add small buffer of 7sec (magic xD) otherwise heartbeat will be too late and connection is closed
             _heartbeatTimeout += 7.0;
         }
-        //DEBUGLOG(@"heartbeatTimeout: %f", _heartbeatTimeout);
+        DEBUGLOG(@"heartbeatTimeout: %f", _heartbeatTimeout);
         
         // index 2 => connection timeout
         
         // get transports
         NSString *t = [data objectAtIndex:3];
         NSArray *transports = [t componentsSeparatedByString:@","];
-        //DEBUGLOG(@"transports: %@", transports);
+        DEBUGLOG(@"transports: %@", transports);
         
         if ([transports indexOfObject:@"websocket"] != NSNotFound) {
-            //DEBUGLOG(@"websocket supported -> using it now");
+            DEBUGLOG(@"websocket supported -> using it now");
             _transport = [[SocketIOTransportWebsocket alloc] initWithDelegate:self];
         }
         else if ([transports indexOfObject:@"xhr-polling"] != NSNotFound) {
-            //DEBUGLOG(@"xhr polling supported -> using it now");
+            DEBUGLOG(@"xhr polling supported -> using it now");
             _transport = [[SocketIOTransportXHR alloc] initWithDelegate:self];
         }
         else {
-            //DEBUGLOG(@"no transport found that is supported :( -> fail");
+            DEBUGLOG(@"no transport found that is supported :( -> fail");
             connectionFailed = true;
             error = [NSError errorWithDomain:SocketIOError
                                         code:SocketIOTransportsNotSupported
@@ -783,7 +766,7 @@ NSString* const SocketIOException = @"SocketIOException";
                                         code:SocketIOServerRespondedWithInvalidConnectionData
                                     userInfo:nil];
         }
-
+        
         if ([_delegate respondsToSelector:@selector(socketIO:onError:)]) {
             [_delegate socketIO:self onError:error];
         }
@@ -837,7 +820,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
     [_handshake cancel];
     _handshake = nil;
-
+    
     _host = nil;
     _sid = nil;
     _endpoint = nil;
