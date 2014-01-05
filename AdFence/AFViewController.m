@@ -8,6 +8,8 @@
 
 #import "AFViewController.h"
 
+#import "AFModel.h"
+
 @interface AFViewController ()
 
 @end
@@ -23,11 +25,14 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if([[TGAccessoryManager sharedTGAccessoryManager] accessory] != nil) {
+        NSLog(@"Connected to MindWave");
         [[TGAccessoryManager sharedTGAccessoryManager] startStream];
     }
     else {
         ;
     }
+//    [AFModel sharedInstance];
+
 }
 
 #pragma mark -
@@ -48,7 +53,7 @@
     [[TGAccessoryManager sharedTGAccessoryManager] startStream];
     
     // set up the current view
-    [self setLoadingScreenView];
+//    [self setLoadingScreenView];
 }
 
 //  This method gets called by the TGAccessoryManager when a ThinkGear-enabled
@@ -65,15 +70,16 @@
      */
     // set up the appropriate view
     
-    [self setLoadingScreenView];
+//    [self setLoadingScreenView];
 }
 
 //  This method gets called by the TGAccessoryManager when data is received from the
 //  ThinkGear-enabled device.
 - (void)dataReceived:(NSDictionary *)data {
     
-    NSString * temp = [[NSString alloc] init];
-    NSDate * date = [NSDate date];
+    NSLog(@"Data:%@", data);
+//    NSString * temp = [[NSString alloc] init];
+//    NSDate * date = [NSDate date];
     
 /*    if([data valueForKey:@"blinkStrength"])
         blinkStrength = [[data valueForKey:@"blinkStrength"] intValue];
@@ -106,7 +112,7 @@
     if([data valueForKey:@"rawCount"]) {
         rawCount = [[data valueForKey:@"rawCount"] intValue];
     }
-    */
+ 
     
     // check to see whether the eSense values are there. if so, we assume that
     // all of the other data (aside from raw) is there. this is not necessarily
@@ -139,9 +145,10 @@
     
     // release the parameter
     [data release];
+ */
 }
 
-#pragma mark -
+/*#pragma mark -
 #pragma mark Internal helper methods
 
 - (void)initLog {
@@ -189,7 +196,7 @@
         [pool drain];
         
     }
-}
+}*/
 
 
 @end

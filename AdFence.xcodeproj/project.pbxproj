@@ -521,6 +521,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AdFence/AdFence-Prefix.pch";
 				INFOPLIST_FILE = "AdFence/AdFence-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/michaelscaria/Desktop/AdFence/AdFence,
@@ -539,6 +540,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AdFence/AdFence-Prefix.pch";
 				INFOPLIST_FILE = "AdFence/AdFence-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/michaelscaria/Desktop/AdFence/AdFence,

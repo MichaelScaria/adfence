@@ -9,7 +9,6 @@
 #import "AFAppDelegate.h"
 
 #import "TGAccessoryManager.h"
-#import "AFModel.h"
 
 #import "AFViewController.h"
 @implementation AFAppDelegate
@@ -18,19 +17,18 @@
 {
     // Override point for customization after application launch.
     BOOL rawEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"raw_enabled"];
-    TGAccessoryType accessoryType = (TGAccessoryType)[[NSUserDefaults standardUserDefaults] integerForKey:@"accessory_type_preference"];
+//    TGAccessoryType accessoryType = (TGAccessoryType)[[NSUserDefaults standardUserDefaults] integerForKey:@"accessory_type_preference"];
     
-    if(rawEnabled) {
+    if(rawEnabled || YES) {
         // setup the TGAccessoryManager to dispatch dataReceived notifications every 0.05s (20 times per second)
-        [[TGAccessoryManager sharedTGAccessoryManager] setupManagerWithInterval:0.05 forAccessoryType:accessoryType];
+        [[TGAccessoryManager sharedTGAccessoryManager] setupManagerWithInterval:0.05 forAccessoryType:TGAccessoryTypeDongle];
     } else {
-        [[TGAccessoryManager sharedTGAccessoryManager] setupManagerWithInterval:0.2 forAccessoryType:accessoryType];
+        [[TGAccessoryManager sharedTGAccessoryManager] setupManagerWithInterval:0.2 forAccessoryType:TGAccessoryTypeStream];
     }
     // set the root UIViewController as the delegate object.
     [[TGAccessoryManager sharedTGAccessoryManager] setDelegate:(AFViewController *)self.window.rootViewController];
     [[TGAccessoryManager sharedTGAccessoryManager] setRawEnabled:rawEnabled];
     
-    [AFModel sharedInstance];
     return YES;
 }
 							
