@@ -53,14 +53,12 @@
         [feedClient listWithParameters:nil success:^(id object) {
             
             NSArray *response = [object objectForKey:@"feeds"];
-            NSLog(@"%@", response);
             feedList = (NSDictionary *)response[0]; //get the first feed
             UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
             if (feedList) {
-//                NSArray *array = (NSArray *);
                 for (NSDictionary *dict in feedList[@"streams"]) {
                     if ([dict[@"name"] isEqualToString:@"starbucks"]) {
-                        NSLog(@"%@", dict[@"value"]);
+                        imageView.image = [UIImage imageNamed:@"starbucks.png"];
                         UIImage *image =[UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:dict[@"value"]]]];
                         imageView.image = image;
                     }
@@ -68,7 +66,7 @@
             }
             else
                 imageView.image = [UIImage imageNamed:@"starbucks.png"];
-            //        [self.view addSubview:imageView];
+            [self.view addSubview:imageView];
             [UIView animateWithDuration:.25 animations:^{
                 imageView.frame = self.view.bounds;
             }completion:^(BOOL isCompleted){
@@ -88,12 +86,22 @@
     else if ([name isEqualToString:@"Starbucks"] && [mood isEqualToString:@"Excited"]) {
         mood = @"Excited";
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
-        imageView.image = [UIImage imageNamed:@"caesars.png"];
-//        [self.view addSubview:imageView];
+        if (feedList) {
+            for (NSDictionary *dict in feedList[@"streams"]) {
+                if ([dict[@"name"] isEqualToString:@"caesars"]) {
+                    NSLog(@"%@", dict[@"value"]);
+                    imageView.image = [UIImage imageNamed:@"caesars.png"];
+                    UIImage *image =[UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:dict[@"value"]]]];
+                    imageView.image = image;
+                }
+            }
+        }
+        else
+            imageView.image = [UIImage imageNamed:@"caesars.png"];
+        [self.view addSubview:imageView];
         [UIView animateWithDuration:.25 animations:^{
             imageView.frame = self.view.bounds;
         }completion:^(BOOL isCompleted){
-            
         }];
     }
 }
