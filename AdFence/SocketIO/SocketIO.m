@@ -409,7 +409,7 @@ returnAllDataFromAck = _returnAllDataFromAck;
 
 - (void) setTimeout
 {
-    DEBUGLOG(@"start/reset timeout");
+//    DEBUGLOG(@"start/reset timeout");
     if (_timeout) {
         dispatch_source_cancel(_timeout);
         _timeout = NULL;
@@ -469,7 +469,7 @@ returnAllDataFromAck = _returnAllDataFromAck;
 
 - (void) onData:(NSString *)data
 {
-    DEBUGLOG(@"onData %@", data);
+//    DEBUGLOG(@"onData %@", data);
     
     // data arrived -> reset timeout
     [self setTimeout];
@@ -504,7 +504,7 @@ returnAllDataFromAck = _returnAllDataFromAck;
                 break;
             }
             case 1: {
-                DEBUGLOG(@"connected");
+//                DEBUGLOG(@"connected");
                 // from socket.io.js ... not sure when data will contain sth?!
                 // packet.qs = data || '';
                 [self onConnect:packet];
@@ -578,15 +578,15 @@ returnAllDataFromAck = _returnAllDataFromAck;
                 break;
             }
             case 7: {
-                DEBUGLOG(@"error");
+//                DEBUGLOG(@"error");
                 break;
             }
             case 8: {
-                DEBUGLOG(@"noop");
+//                DEBUGLOG(@"noop");
                 break;
             }
             default: {
-                DEBUGLOG(@"command not found or not yet supported");
+//                DEBUGLOG(@"command not found or not yet supported");
                 break;
             }
         }

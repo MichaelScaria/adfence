@@ -6,6 +6,11 @@
 //  Copyright (c) 2014 MichaelScaria. All rights reserved.
 //
 
+#import <FYX/FYX.h>
+#import <FYX/FYXSightingManager.h>
+#import <FYX/FYXTransmitter.h>
+#import <FYX/FYXVisit.h>
+
 #import "AFViewController.h"
 
 #import "AFModel.h"
@@ -20,6 +25,7 @@
 {
     [super viewDidLoad];
 	values = [[NSMutableArray alloc] initWithCapacity:1000];
+    mood = @"Calm";
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -32,11 +38,42 @@
         ;
     }
     [AFModel sharedInstance];
-
+    [FYX startService:self];
+    self.sightingManager = [FYXSightingManager new];
+    self.sightingManager.delegate = self;
+    [self.sightingManager scan];
 }
 
-#pragma mark -
-#pragma mark TGAccessoryDelegate protocol methods
+- (void)displayTransmitterAd:(NSString *)name {
+    if ([name isEqualToString:@"Starbucks"] && [mood isEqualToString:@"Calm"]) {
+        mood = @"Excited";
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
+        imageView.image = [UIImage imageNamed:@"starbucks.png"];
+        [self.view addSubview:imageView];
+        [UIView animateWithDuration:.25 animations:^{
+            imageView.frame = self.view.bounds;
+        }completion:^(BOOL isCompleted){
+            //TODO: Make delay longer around 30
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+//                [[TGAccessoryManager sharedTGAccessoryManager] startStream];
+                [FYX startService:self];
+            });
+        }];
+    }
+    else if ([name isEqualToString:@"Starbucks"] && [mood isEqualToString:@"Excited"]) {
+        mood = @"Excited";
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
+        imageView.image = [UIImage imageNamed:@"caesars.png"];
+        [self.view addSubview:imageView];
+        [UIView animateWithDuration:.25 animations:^{
+            imageView.frame = self.view.bounds;
+        }completion:^(BOOL isCompleted){
+            
+        }];
+    }
+}
+
+#pragma mark TGAccessoryDelegate
 
 //  This method gets called by the TGAccessoryManager when a ThinkGear-enabled
 //  accessory is connected.
@@ -51,7 +88,6 @@
     
     // start the data stream to the accessory
     [[TGAccessoryManager sharedTGAccessoryManager] startStream];
-    
     // set up the current view
 //    [self setLoadingScreenView];
 }
@@ -81,7 +117,49 @@
             [values removeAllObjects];
         }
     }
-    
-
 }
+
+
+
+#pragma mark FYXServiceDelegate
+
+
+- (void)serviceStarted
+{
+    // this will be invoked if the service has successfully started
+    // bluetooth scanning will be started at this point.
+    NSLog(@"FYX Service Successfully Started");
+}
+
+
+- (void)startServiceFailed:(NSError *)error
+{
+    // this will be called if the service has failed to start
+    NSLog(@"FYX Error:%@", error);
+}
+
+- (void)sessionEnded
+{
+    NSLog(@"FYX End");
+    // this will be invoked if the session has successfully ended and the user is deauthorized
+}
+
+- (void)sessionEndFailed:(NSError *)error
+{
+    NSLog(@"FYX Failed");
+    // this will be called if the session has failed to end
+}
+
+#pragma mark FYXSightingDelegate
+
+- (void)didReceiveSighting:(FYXTransmitter *)transmitter time:(NSDate *)time RSSI:(NSNumber *)RSSI
+{
+    // this will be invoked when an authorized transmitter is sighted
+    NSLog(@"I received a FYX sighting!!! %@ - %@", transmitter.name, RSSI);
+//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"FYX" message:@"sighting" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+//    [alert show];
+    [self displayTransmitterAd:transmitter.name];
+    [FYX stopService];
+}
+
 @end

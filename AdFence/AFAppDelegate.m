@@ -9,8 +9,13 @@
 #import "AFAppDelegate.h"
 
 #import "TGAccessoryManager.h"
+#import <FYX/FYX.h>
 
 #import "AFViewController.h"
+
+#define APP_ID @"ca120314eab2ae1462f41b5d39a54258b61528ed8514e3715e9666c3004f8b6c"
+#define SECRET @"c2224d0eb70b4839701b3540b9d97b4a3ce908fc8e8f72771947e17ce5524fe1"
+#define CALLBACK @"adfence://test"
 @implementation AFAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -25,6 +30,7 @@
     [[TGAccessoryManager sharedTGAccessoryManager] setDelegate:(AFViewController *)self.window.rootViewController];
     [[TGAccessoryManager sharedTGAccessoryManager] setRawEnabled:YES];
     
+    [FYX setAppId:APP_ID appSecret:SECRET callbackUrl:CALLBACK];
     return YES;
 }
 							

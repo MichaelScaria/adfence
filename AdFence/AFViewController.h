@@ -7,11 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <FYX/FYXSightingManager.h>
+
 #import "TGAccessoryManager.h"
 
 
-@interface AFViewController : UIViewController <TGAccessoryDelegate> {
+@interface AFViewController : UIViewController <TGAccessoryDelegate, FYXServiceDelegate, FYXSightingDelegate> {
     NSMutableArray *values;
+    NSString *mood;
 }
 
+@property (nonatomic) FYXSightingManager *sightingManager;
 @end
