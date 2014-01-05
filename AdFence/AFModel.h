@@ -15,4 +15,6 @@
 }
 
 + (AFModel *)sharedInstance;
+
+- (void)sendRawData:(NSArray *)values;
 @end

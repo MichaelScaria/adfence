@@ -10,6 +10,8 @@
 #import "TGAccessoryManager.h"
 
 
-@interface AFViewController : UIViewController <TGAccessoryDelegate>
+@interface AFViewController : UIViewController <TGAccessoryDelegate> {
+    NSMutableArray *values;
+}
 
 @end

@@ -116,6 +116,7 @@ typedef enum {
 - (void) sendMessage:(NSString *)data withAcknowledge:(SocketIOCallback)function;
 - (void) sendJSON:(NSDictionary *)data;
 - (void) sendJSON:(NSDictionary *)data withAcknowledge:(SocketIOCallback)function;
+- (void) sendEvent:(NSString *)eventName withData:(id)data;
 - (void) sendEvent:(NSString *)eventName toPath:(NSString *)path;
 - (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method;
 - (void) sendEvent:(NSString *)eventName toPath:(NSString *)path withMethod:(NSString *)method withData:(id)data;

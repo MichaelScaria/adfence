@@ -219,6 +219,11 @@ NSString* const SocketIOException = @"SocketIOException";
     [self send:packet];
 }
 
+- (void) sendEvent:(NSString *)eventName withData:(id)data
+{
+    [self sendEvent:eventName toPath:nil withMethod:nil withData:data andAcknowledge:nil];
+}
+
 - (void) sendEvent:(NSString *)eventName toPath:(NSString *)path
 {
     [self sendEvent:eventName toPath:path withMethod:nil withData:nil andAcknowledge:nil];

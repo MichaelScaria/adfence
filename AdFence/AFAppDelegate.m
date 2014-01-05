@@ -16,18 +16,14 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    BOOL rawEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"raw_enabled"];
 //    TGAccessoryType accessoryType = (TGAccessoryType)[[NSUserDefaults standardUserDefaults] integerForKey:@"accessory_type_preference"];
     
-    if(rawEnabled || YES) {
-        // setup the TGAccessoryManager to dispatch dataReceived notifications every 0.05s (20 times per second)
-        [[TGAccessoryManager sharedTGAccessoryManager] setupManagerWithInterval:0.05 forAccessoryType:TGAccessoryTypeDongle];
-    } else {
-        [[TGAccessoryManager sharedTGAccessoryManager] setupManagerWithInterval:0.2 forAccessoryType:TGAccessoryTypeStream];
-    }
+    // setup the TGAccessoryManager to dispatch dataReceived notifications every 0.05s (20 times per second)
+    [[TGAccessoryManager sharedTGAccessoryManager] setupManagerWithInterval:0.05 forAccessoryType:TGAccessoryTypeDongle];
+
     // set the root UIViewController as the delegate object.
     [[TGAccessoryManager sharedTGAccessoryManager] setDelegate:(AFViewController *)self.window.rootViewController];
-    [[TGAccessoryManager sharedTGAccessoryManager] setRawEnabled:rawEnabled];
+    [[TGAccessoryManager sharedTGAccessoryManager] setRawEnabled:YES];
     
     return YES;
 }
