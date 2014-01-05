@@ -12,7 +12,7 @@
 #import "TGAccessoryManager.h"
 #import "FeedsClient.h"
 
-@interface AFViewController : UIViewController <TGAccessoryDelegate, FYXServiceDelegate, FYXSightingDelegate> {
+@interface AFViewController : UIViewController <TGAccessoryDelegate, FYXServiceDelegate, FYXSightingDelegate, UIGestureRecognizerDelegate> {
     NSMutableArray *values;
     NSString *mood;
     FeedsClient *feedClient;

@@ -71,9 +71,13 @@
                 imageView.frame = self.view.bounds;
             }completion:^(BOOL isCompleted){
                 //TODO: Make delay longer around 30
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                    [FYX startService:self];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                    UITapGestureRecognizer *recogizer= [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped)];
+                    recogizer.delegate = self;
+                    imageView.userInteractionEnabled = YES;
+                    [imageView addGestureRecognizer:recogizer];
                 });
+                
             }];
             
         } failure:^(NSError *error, NSDictionary *message) {
@@ -106,6 +110,9 @@
     }
 }
 
+- (void)tapped {
+    [FYX startService:self];
+}
 #pragma mark TGAccessoryDelegate
 
 //  This method gets called by the TGAccessoryManager when a ThinkGear-enabled
