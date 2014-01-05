@@ -26,7 +26,6 @@
     [super viewDidLoad];
 	values = [[NSMutableArray alloc] initWithCapacity:1000];
     mood = @"Calm";
-    feedList = [[NSMutableArray alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -45,7 +44,7 @@
     [self.sightingManager scan];
     
     feedClient = [[FeedsClient alloc] init];
-    [feedClient setFeed_key:@"695945db9bf748a9abb9cf8d6a1bfb6c"];
+    [feedClient setFeed_key:@"737999a1ef4a4cd0d87aefc5ead14b01"];
 }
 
 - (void)displayTransmitterAd:(NSString *)name {
@@ -53,39 +52,44 @@
         mood = @"Excited";
         [feedClient listWithParameters:nil success:^(id object) {
             
-            NSDictionary *response = [object objectForKey:@"feeds"];
-            feedList = [NSMutableArray array];
-            for (NSDictionary *feed in response) {
-                //show only active feeds
-                NSLog(@"Feed:%@", feed);
-                if([[feed valueForKey:@"status"] isEqualToString:@"enabled"])
-                    [feedList addObject:feed];
+            NSArray *response = [object objectForKey:@"feeds"];
+            NSLog(@"%@", response);
+            feedList = (NSDictionary *)response[0]; //get the first feed
+            UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
+            if (feedList) {
+//                NSArray *array = (NSArray *);
+                for (NSDictionary *dict in feedList[@"streams"]) {
+                    if ([dict[@"name"] isEqualToString:@"starbucks"]) {
+                        NSLog(@"%@", dict[@"value"]);
+                        UIImage *image =[UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:dict[@"value"]]]];
+                        imageView.image = image;
+                    }
+                }
             }
+            else
+                imageView.image = [UIImage imageNamed:@"starbucks.png"];
+            //        [self.view addSubview:imageView];
+            [UIView animateWithDuration:.25 animations:^{
+                imageView.frame = self.view.bounds;
+            }completion:^(BOOL isCompleted){
+                //TODO: Make delay longer around 30
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                    [FYX startService:self];
+                });
+            }];
             
         } failure:^(NSError *error, NSDictionary *message) {
             NSLog(@"Error: %@",[error description]);
             NSLog(@"Message: %@",message);
         }];
         
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
-        imageView.image = [UIImage imageNamed:@"starbucks.png"];
-        [self.view addSubview:imageView];
         
-        
-        [UIView animateWithDuration:.25 animations:^{
-            imageView.frame = self.view.bounds;
-        }completion:^(BOOL isCompleted){
-            //TODO: Make delay longer around 30
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                [FYX startService:self];
-            });
-        }];
     }
     else if ([name isEqualToString:@"Starbucks"] && [mood isEqualToString:@"Excited"]) {
         mood = @"Excited";
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
         imageView.image = [UIImage imageNamed:@"caesars.png"];
-        [self.view addSubview:imageView];
+//        [self.view addSubview:imageView];
         [UIView animateWithDuration:.25 animations:^{
             imageView.frame = self.view.bounds;
         }completion:^(BOOL isCompleted){

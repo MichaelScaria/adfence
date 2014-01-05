@@ -36,10 +36,10 @@
     
     M2x* m2x = [M2x shared];
     //set the Master Api Key
-    m2x.api_key = @"e25333763bac942da7c38635c3581478";
+    m2x.api_key = @"737999a1ef4a4cd0d87aefc5ead14b01";
     //set the api url
 //    m2x.api_url = @"http://api-m2x.att.com/v1/feeds/695945db9bf748a9abb9cf8d6a1bfb6c";
-    m2x.api_url = @"695945db9bf748a9abb9cf8d6a1bfb6c";
+//    m2x.api_url = @"695945db9bf748a9abb9cf8d6a1bfb6c";
     return YES;
 }
 							

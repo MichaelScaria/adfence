@@ -18,7 +18,7 @@
 -(void)listWithParameters:(NSDictionary*)parameters success:(M2XAPIClientSuccessObject)success failure:(M2XAPIClientFailureError)failure{
     
     NSString *path = @"/feeds";
-    path = @"/";
+//    path = @"/";
     [[M2x shared] getWithPath:path andParameters:parameters api_key:[self getApiKey] success:success failure:failure];
     
 }

@@ -16,7 +16,7 @@
     NSMutableArray *values;
     NSString *mood;
     FeedsClient *feedClient;
-    NSMutableArray *feedList;
+    NSDictionary *feedList;
 }
 
 @property (nonatomic) FYXSightingManager *sightingManager;
