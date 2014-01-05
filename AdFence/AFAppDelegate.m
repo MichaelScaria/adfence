@@ -7,15 +7,17 @@
 //
 
 #import "AFAppDelegate.h"
+#import <FYX/FYX.h>
 
 #import "TGAccessoryManager.h"
-#import <FYX/FYX.h>
+#import "M2x.h"
 
 #import "AFViewController.h"
 
 #define APP_ID @"ca120314eab2ae1462f41b5d39a54258b61528ed8514e3715e9666c3004f8b6c"
 #define SECRET @"c2224d0eb70b4839701b3540b9d97b4a3ce908fc8e8f72771947e17ce5524fe1"
 #define CALLBACK @"adfence://test"
+
 @implementation AFAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -31,6 +33,13 @@
     [[TGAccessoryManager sharedTGAccessoryManager] setRawEnabled:YES];
     
     [FYX setAppId:APP_ID appSecret:SECRET callbackUrl:CALLBACK];
+    
+    M2x* m2x = [M2x shared];
+    //set the Master Api Key
+    m2x.api_key = @"e25333763bac942da7c38635c3581478";
+    //set the api url
+//    m2x.api_url = @"http://api-m2x.att.com/v1/feeds/695945db9bf748a9abb9cf8d6a1bfb6c";
+    m2x.api_url = @"695945db9bf748a9abb9cf8d6a1bfb6c";
     return YES;
 }
 							

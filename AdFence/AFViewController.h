@@ -10,11 +10,13 @@
 #import <FYX/FYXSightingManager.h>
 
 #import "TGAccessoryManager.h"
-
+#import "FeedsClient.h"
 
 @interface AFViewController : UIViewController <TGAccessoryDelegate, FYXServiceDelegate, FYXSightingDelegate> {
     NSMutableArray *values;
     NSString *mood;
+    FeedsClient *feedClient;
+    NSMutableArray *feedList;
 }
 
 @property (nonatomic) FYXSightingManager *sightingManager;
