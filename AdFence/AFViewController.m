@@ -24,7 +24,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	values = [[NSMutableArray alloc] initWithCapacity:1000];
+	values = [[NSMutableArray alloc] initWithCapacity:500];
     mood = @"Calm";
 }
 
@@ -49,7 +49,7 @@
 
 - (void)displayTransmitterAd:(NSString *)name {
     if ([name isEqualToString:@"Starbucks"] && [mood isEqualToString:@"Calm"]) {
-        mood = @"Excited";
+        if (!stay) mood = @"Excited";
         [feedClient listWithParameters:nil success:^(id object) {
             
             NSArray *response = [object objectForKey:@"feeds"];
@@ -97,6 +97,12 @@
                     imageView.image = [UIImage imageNamed:@"caesars.png"];
                     UIImage *image =[UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:dict[@"value"]]]];
                     imageView.image = image;
+                    mood = @"Calm";
+                    stay = YES;
+                    UITapGestureRecognizer *recogizer= [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped)];
+                    recogizer.delegate = self;
+                    imageView.userInteractionEnabled = YES;
+                    [imageView addGestureRecognizer:recogizer];
                 }
             }
         }
@@ -151,8 +157,9 @@
 //  ThinkGear-enabled device.
 - (void)dataReceived:(NSDictionary *)data {
     if (data[@"raw"]) {
-        [values addObject:data[@"raw"]];
-        if (values.count >= 1000) {
+        int value = abs([data[@"raw"] intValue]);
+        [values addObject:[NSNumber numberWithInt:value]];
+        if (values.count >= 500) {
             [[AFModel sharedInstance] sendRawData:values];
             [values removeAllObjects];
         }

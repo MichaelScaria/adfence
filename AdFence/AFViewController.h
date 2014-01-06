@@ -17,6 +17,7 @@
     NSString *mood;
     FeedsClient *feedClient;
     NSDictionary *feedList;
+    BOOL stay;
 }
 
 @property (nonatomic) FYXSightingManager *sightingManager;
